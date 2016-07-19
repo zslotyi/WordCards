@@ -15,12 +15,17 @@ import com.google.api.services.sheets.v4.Sheets;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 public class SheetsQuickstart {
     
     List<List<Object>> values;
+    private HashMap<Integer, List> validWords;
+    private ArrayList<Integer> validKeys;
     
     /** Application name. */
     private static final String APPLICATION_NAME =
@@ -143,14 +148,35 @@ public class SheetsQuickstart {
      * it will return the number of valid values it finds
      */
     int countTheRows (int k) {
+        validWords = new HashMap<>();
+        validKeys = new ArrayList<>();
         int e=0;
         for (List row : values) {
             if (row.get(k) != "") {
+                storeValidWords(e,row);
                 e++;
             }
         }
         return e;
     }
+    private void storeValidWords(int e, List row) {
+        validWords.put(e, row);
+        validKeys.add(e);
+    }
+    List getRandomWord() {
+        if (validWords.isEmpty() || validKeys.isEmpty())
+        {
+            throw new AssertionError("The valid words and valid keys must not be empty when calling a random word!");
+        }
+        Random randomGenerator = new Random();
+        int index = randomGenerator.nextInt(validKeys.size());
+        Integer key = validKeys.get(index);
+            if (!(key instanceof Integer))
+            {
+                throw new AssertionError ("The retrieved key must be of Integer type!");
+            }
+            return validWords.get(key);
+   }
 
 
 }
