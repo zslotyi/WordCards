@@ -50,6 +50,8 @@ private Button submitButton, helpButton;
         setUpWordBoard();
         setUpScoreBoard();
         
+        dictionary.WriteExample2();
+        
         primaryStage.show();
         askAWord();
         
