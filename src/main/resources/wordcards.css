@@ -8,3 +8,19 @@ and open the template in the editor.
     Author     : ballaz
 */
 
+.questionword {
+    -fx-font-family:"Verdana, Arial, Helvetica";
+    -fx-font-size:24px;
+    -fx-color:#333333;
+    -fx-padding:24px;
+}
+.scoreboard {
+    -fx-font-family:"Verdana, Arial, Helvetica";
+    -fx-font-size:14px;
+    -fx-color:#333333;
+    -fx-padding:24px;
+}
+.scoreboard-pane {
+    -fx-text-align:right;
+    -fx-background:#CAFFEE;
+}

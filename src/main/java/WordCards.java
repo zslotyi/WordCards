@@ -10,12 +10,13 @@ import java.util.Random;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
+import javafx.geometry.HPos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -31,7 +32,7 @@ private Scene primaryScene;
 private SheetsQuickstart dictionary;
 private Label feedback, numberOfWords, questionWord, numberOfAttempts, numberOfAttemptsNow, numberOfSuccess, numberOfSuccessNow, numberOfFailure, numberOfFailureNow, successRate, successRateNow;
 private TextField answerWord;
-private Button submitButton, helpButton;
+private Button submitButton, helpButton, itWasRight;
 private double allAttempts, successAttempts, failureAttempts, allAttemptsToday, successAttemptsToday, failureAttemptsToday;
 private double allSuccessRate, successRateToday;
 private String correctAnswer;
@@ -43,6 +44,9 @@ private String correctAnswer;
         rootNode = new GridPane();
         wordNode = new GridPane();
         scoreNode = new GridPane();
+            ColumnConstraints col1 = new ColumnConstraints();
+            col1.setHalignment(HPos.RIGHT);
+            scoreNode.getColumnConstraints().addAll(col1,col1,col1);
         
         rootNode.add(wordNode,1,1);
         rootNode.add(scoreNode,1,2);
@@ -85,6 +89,7 @@ private String correctAnswer;
      */
     private void setUpWordBoard() {
         questionWord = new Label("Placeholder");
+            questionWord.getStyleClass().add("questionword");
         answerWord = new TextField("Your answer here");
         
      answerWord.setOnKeyPressed((event) -> { 
@@ -94,50 +99,72 @@ private String correctAnswer;
             submitButton.setOnAction((al)->checkAnswer());
         helpButton = new Button("Help");
             helpButton.setOnAction((al)->helpWithAnswer());
-        
+        itWasRight = new Button ("Twas right!");
+            itWasRight.setOnAction((al)->itWasRight());
+            itWasRight.setDisable(true);
         feedback = new Label ("");
+        feedback.getStyleClass().add("scoreboard");
         wordNode.add(questionWord, 0,0);
         wordNode.add(answerWord, 1,0);
         wordNode.add(submitButton,0,1);
         wordNode.add(helpButton,1,1);
+        wordNode.add(itWasRight,1,2);
         wordNode.add(feedback,0,2);
         
     }
     private void setUpScoreBoard() throws IOException {
         numberOfWords = new Label(" " + dictionary.countTheRows(0));
+        numberOfWords.getStyleClass().add("scoreboard");
         scoreNode.add(numberOfWords, 0, 0);
         
+        
         allAttempts = Integer.parseInt(dictionary.getCellValue("Data!H2"));
-        numberOfAttempts = new Label("Number of Attempts: " + (int)allAttempts);
+        numberOfAttempts = new Label("Number of Attempts:    " + (int)allAttempts);
+        numberOfAttempts.getStyleClass().add("scoreboard");
+        
         scoreNode.add(numberOfAttempts, 0, 1);
         
         successAttempts = Integer.parseInt(dictionary.getCellValue("Data!I2"));
-        numberOfSuccess = new Label("Successful: " + (int)successAttempts);
+        numberOfSuccess = new Label("Successful:    " + (int)successAttempts);
+        numberOfSuccess.getStyleClass().add("scoreboard");
+        
         scoreNode.add(numberOfSuccess, 1, 1);
         
         failureAttempts = Integer.parseInt(dictionary.getCellValue("Data!J2"));
-        numberOfFailure = new Label("Failed: " + (int)failureAttempts);
+        numberOfFailure = new Label("Failed:    " + (int)failureAttempts);
+        numberOfFailure.getStyleClass().add("scoreboard");
+        
         scoreNode.add(numberOfFailure, 2, 1);
         
         allAttemptsToday = 0;
         successAttemptsToday=0;
         failureAttemptsToday=0;
         
-        numberOfAttemptsNow = new Label("Today: " + (int)allAttemptsToday);
+        numberOfAttemptsNow = new Label("Today:    " + (int)allAttemptsToday);
+        numberOfAttemptsNow.getStyleClass().add("scoreboard");
+        
         scoreNode.add(numberOfAttemptsNow, 0, 2);
         
         numberOfSuccessNow = new Label(" " + (int)successAttemptsToday);
+        numberOfSuccessNow.getStyleClass().add("scoreboard");
+        
         scoreNode.add(numberOfSuccessNow, 1, 2);
         
         numberOfFailureNow = new Label(" " + (int)failureAttemptsToday);
+        numberOfFailureNow.getStyleClass().add("scoreboard");
+        
         scoreNode.add(numberOfFailureNow, 2, 2);
         
         calculateSuccessRate();
         
-        successRate = new Label("Success Rate: " + (int)allSuccessRate);
+        successRate = new Label("Success Rate:    " + (int)allSuccessRate);
+        successRate.getStyleClass().add("scoreboard");
+        
         scoreNode.add(successRate, 1, 0);
         
-        successRateNow = new Label("Today " + (int)successRateToday);
+        successRateNow = new Label("Today    " + (int)successRateToday);
+        successRateNow.getStyleClass().add("scoreboard");
+        
         scoreNode.add(successRateNow, 2, 0);
                 
     }
@@ -147,6 +174,13 @@ private String correctAnswer;
         numberOfSuccessNow.setText("" +(int)successAttemptsToday);
         numberOfFailureNow.setText("" +(int)failureAttemptsToday);
         successRateNow.setText("" +(int)successRateToday);        
+    }
+    private void itWasRight()
+    {
+        failureAttemptsToday--;
+        successAttemptsToday++;
+        updateScoreBoard();
+        itWasRight.setDisable(true);
     }
     private void calculateSuccessRate() {
         if (allAttemptsToday!=0) {
@@ -191,7 +225,7 @@ private String correctAnswer;
         
         String checkCorrect = flattenToAscii(correctAnswer);
         String checkYours = flattenToAscii(answerWord.getText());
-        
+        itWasRight.setDisable(true);
         //feedback.setText("Checkyours: \"" + checkYours + "\" CheckCorrect: \"" + checkCorrect + "\"");
         
         if (checkYours.equals(checkCorrect)) //helyes megoldás
@@ -201,8 +235,9 @@ private String correctAnswer;
         }
         else //hibás megoldás
         {
-            feedback.setText("No! Your answer was \"" + checkYours + "\" and the correct answer is \"" + checkCorrect + "\"");
+            feedback.setText("No! Your answer was \"" + checkYours + "\" \nand the correct answer is \n\"" + checkCorrect + "\"");
             failureAttemptsToday++;
+            itWasRight.setDisable(false);
         }
         
         answerWord.clear();
