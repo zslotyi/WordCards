@@ -287,6 +287,9 @@ private String correctAnswer;
         return str;
     }
     private void helpWithAnswer(){
+        feedback.setText(questionWord + correctAnswer);
+        answerWord.clear();
+        askAWord();
         
     }
     private void setGameOver() throws IOException{
